@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Main file for the project
+Main file
 """
 
-hsh_psswd = __import__('encrypt_password').hash_password
+hash_password = __import__('encrypt_password').hash_password
 
 password = "MyAmazingPassw0rd"
-print(hsh_psswd(password))
-print(hsh_psswd(password))
+print(hash_password(password))
+print(hash_password(password))

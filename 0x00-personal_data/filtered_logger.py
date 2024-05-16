@@ -1,100 +1,45 @@
 #!/usr/bin/env python3
-
-'''
-This module contains the following:
-- filter_datum
-- RedactingFormatter
-- get_logger
-- get_db
-- main
-'''
-
+""" doc doc doc """
 import re
+from typing import List
 import logging
 import os
 import mysql.connector
-from typing import List
-
 
 
 def filter_datum(
-    fields: List[str], redaction: str, final_msg: str, separator: str
+    fields: List[str], redaction: str, message: str, separator: str
 ) -> str:
-    '''
-    Returns a string.
-    
-    Args:
-        fields: a list of strings.
-        redaction: a string argument.
-        message: a string argument.
-        separator: a string argument.
-    
-    Returns:
-        A string.
-    '''
-    for fie in fields:
-        pattern = f"{fie}=[^{separator}]*"
-        final_msg = re.sub(pattern, f"{fie}={redaction}", final_msg)
-    return final_msg
+    """doc doc doc"""
+    for field in fields:
+        regex = f"{field}=[^{separator}]*"
+        message = re.sub(regex, f"{field}={redaction}", message)
+    return message
 
 
 class RedactingFormatter(logging.Formatter):
-    '''
-    RedactingFormatter class.
-    
-    Attributes:
-        REDACTION: a string.
-        FORMAT: a string.
-        SEPARATOR: a string.
-    
-    Methods:
-        format: Returns a string.
-    '''
+    """doc doc doc"""
 
     REDACTION = "***"
     FORMAT = "[HOLBERTON] %(name)s %(levelname)s %(asctime)-15s: %(message)s"
     SEPARATOR = ";"
 
     def __init__(self, fields: List[str]):
-        '''
-        Initializes the RedactingFormatter object.
-        
-        Args:
-            fields: a list of strings.
-        
-        Returns:
-            None.
-        '''
+        """doc doc doc"""
         super(RedactingFormatter, self).__init__(self.FORMAT)
         self.fields = fields
 
     def format(self, record: logging.LogRecord) -> str:
-        '''
-        Returns a string.
-        
-        Args:
-            record: a logging.LogRecord object.
-        
-        Returns:
-            A string.
-        '''
-        record_org = super().format(record)
-        return filter_datum(self.fields, self.REDACTION, record_org, self.SEPARATOR)
+        """doc doc doc"""
+        org = super().format(record)
+        return filter_datum(self.fields, self.REDACTION, org, self.SEPARATOR)
 
 
 PII_FIELDS = ("name", "email", "phone", "ssn", "password")
 
 
 def get_logger() -> logging.Logger:
-    '''
-    Returns a logging.Logger object.
-    
-    Args:
-        None.
-    
-    Returns:
-        A logging.Logger object.
-    '''
+    """doc doc doc"""
     log = logging.getLogger("user_data")
     log.setLevel(logging.INFO)
     log.propagate = False
@@ -105,39 +50,32 @@ def get_logger() -> logging.Logger:
 
 
 def get_db() -> mysql.connector.connection.MySQLConnection:
-    '''
-    Returns a MySQLConnection object.
-
-    Args:
-        None.
-    '''
-    uname = os.getenv("PERSONAL_DATA_DB_USERNAME", "root")
-    psswd = os.getenv("PERSONAL_DATA_DB_PASSWORD", "")
+    """doc doc doc"""
+    username = os.getenv("PERSONAL_DATA_DB_USERNAME", "root")
+    password = os.getenv("PERSONAL_DATA_DB_PASSWORD", "")
     host = os.getenv("PERSONAL_DATA_DB_HOST", "localhost")
     db_name = os.getenv("PERSONAL_DATA_DB_NAME")
 
     return mysql.connector.connect(
-        user=uname, password=psswd, host=host, database=db_name
+        user=username, password=password, host=host, database=db_name
     )
 
 
 def main() -> None:
-    '''
-    Main function.
-    '''
-    database = get_db()
-    crsr = database.cursor()
-    crsr.execute("SELECT * FROM users;")
+    """doc doc doc"""
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM users;")
     log = get_logger()
-    for element in crsr:
-        dt = []
-        for desc, value in zip(crsr.description, element):
+    for row in cursor:
+        data = []
+        for desc, value in zip(cursor.description, row):
             pair = f"{desc[0]}={str(value)}"
-            dt.append(pair)
-        row_str = "; ".join(dt)
+            data.append(pair)
+        row_str = "; ".join(data)
         log.info(row_str)
-    crsr.close()
-    database.close()
+    cursor.close()
+    db.close()
 
 
 if __name__ == "__main__":

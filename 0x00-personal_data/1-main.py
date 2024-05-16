@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
+"""
+Main file
+"""
 
-'''
-Main file for the project
-'''
-
-import re
 import logging
+import re
 
 RedactingFormatter = __import__("filtered_logger").RedactingFormatter
 

@@ -1,14 +1,7 @@
 #!/usr/bin/env python3
-
-'''
-This module contains the following:
-- get_logger
-- PII_FIELDS
-- filter_datum
-- get_filtered_logger
-- RedactingFormatter
-- main
-'''
+"""
+Main file
+"""
 
 import logging
 

@@ -112,11 +112,15 @@ def main() -> None:
     csr = db_connector.cursor()
     csr.execute("SELECT * FROM users;")
     logger = get_logger()
+
     for row in csr:
-        message = ""
-        for i in range(len(row)):
-            message += f"{csr.column_names[i]}={str(row[i])}; "
-        logger.info(message)
+        # Check if any of the row values are in PII_FIELDS
+        if any(field in str(row) for field in PII_FIELDS):
+            message = ""
+            for i in range(len(row)):
+                message += f"{csr.column_names[i]}={str(row[i])}; "
+            logger.info(message)
+
     csr.close()
     db_connector.close()
 

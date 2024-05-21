@@ -28,17 +28,21 @@ def stats() -> str:
 
 @app_views.route('/unauthorized/', strict_slashes=False)
 def error_401() -> str:
-    """ GET /api/v1/stats
-    Return:
-      - the number of each objects
-    """
+    '''
+    This function returns a 401 error
+
+    Returns:
+        401 error
+    '''
     return abort(401)
 
 
 @app_views.route('/forbidden/', strict_slashes=False)
 def error_403() -> str:
-    """ GET /api/v1/stats
-    Return:
-      - the number of each objects
-    """
+    '''
+    This function returns a 403 error
+
+    Returns:
+        403 error
+      '''
     return abort(403)

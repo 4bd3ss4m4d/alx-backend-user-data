@@ -25,11 +25,16 @@ else:
 
 @app.before_request
 def handle_before_request() -> None:
-    """runs before each request"""
-    auth_list = ['/api/v1/status/',
+    '''
+    This function is responsible for handling the before request
+
+    Returns:
+        None
+    '''
+    authen_ls = ['/api/v1/status/',
                  '/api/v1/unauthorized/', '/api/v1/forbidden/']
     if auth:
-        if auth.require_auth(request.path, auth_list):
+        if auth.require_auth(request.path, authen_ls):
             if not auth.authorization_header(request):
                 abort(401)
             if not auth.current_user(request):
@@ -38,23 +43,35 @@ def handle_before_request() -> None:
 
 @app.errorhandler(404)
 def not_found(error) -> str:
-    """ Not found handler
-    """
+    '''
+    This function returns a 404 error
+
+    Returns:
+        404 error
+    '''
     return jsonify({"error": "Not found"}), 404
-
-
-@app.errorhandler(401)
-def unauthorized(error) -> str:
-    """ Not found handler
-    """
-    return jsonify({"error": "Unauthorized"}), 401
 
 
 @app.errorhandler(403)
 def forbidden(error) -> str:
-    """ Not found handler
-    """
+    '''
+    This function returns a 403 error
+
+    Returns:
+        403 error
+    '''
     return jsonify({"error": "Forbidden"}), 403
+
+
+@app.errorhandler(401)
+def unauthorized(error) -> str:
+    '''
+    This function returns a 401 error
+
+    Returns:
+        401 error
+    '''
+    return jsonify({"error": "Unauthorized"}), 401
 
 
 if __name__ == "__main__":

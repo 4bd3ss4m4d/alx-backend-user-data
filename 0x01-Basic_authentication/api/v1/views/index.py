@@ -30,7 +30,6 @@ def stats() -> str:
 def error_401() -> str:
     '''
     This function returns a 401 error
-    
     Returns:
         [str]: [description]
       '''
@@ -41,7 +40,6 @@ def error_401() -> str:
 def error_403() -> str:
     '''
     This function returns a 403 error
-    
     Returns:
         [str]: [description]
     '''

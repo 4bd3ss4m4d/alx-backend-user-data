@@ -1,70 +1,63 @@
 #!/usr/bin/env python3
-
-'''
-This module contains the Auth class
-'''
-
+"""
+Route module for the API
+"""
+from os import getenv
 from api.v1.views import app_views
-from typing import TypeVar, List
-from flask import jsonify, abort, request
+from flask import Flask, jsonify, abort, request
+from flask_cors import (CORS, cross_origin)
+import os
 
 
-class Auth:
-    '''
-    Auth class
+app = Flask(__name__)
+app.register_blueprint(app_views)
+CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
+auth = None
+auth = getenv("AUTH_TYPE")
 
-    Attributes:
-        None
+if auth == "basic_auth":
+    from api.v1.auth.basic_auth import BasicAuth
+    auth = BasicAuth()
+else:
+    from api.v1.auth.auth import Auth
+    auth = Auth()
 
-    Methods:
-        require_auth(self, path: str, excluded_paths: List[str]) -> bool
-        authorization_header(self, request=None) -> str
-        current_user(self, request=None) -> TypeVar('User')
-    '''
-    def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
-        '''
-        This function checks if a path requires authentication
 
-        Args:
-            path: str
-            excluded_paths: List[str]
+@app.before_request
+def handle_before_request() -> None:
+    """runs before each request"""
+    auth_list = ['/api/v1/status/',
+                 '/api/v1/unauthorized/', '/api/v1/forbidden/']
+    if auth:
+        if auth.require_auth(request.path, auth_list):
+            if not auth.authorization_header(request):
+                abort(401)
+            if not auth.current_user(request):
+                abort(403)
 
-        Returns:
-            True if the path requires authentication, False otherwise
-        '''
-        if not path or not excluded_paths or excluded_paths == []:
-            return True
 
-        if not path.endswith('/'):
-            path = path + '/'
+@app.errorhandler(404)
+def not_found(error) -> str:
+    """ Not found handler
+    """
+    return jsonify({"error": "Not found"}), 404
 
-        for nod_inc in excluded_paths:
-            if nod_inc == path or path.startswith(nod_inc.split('*')[0]):
-                return False
-        return True
 
-    def authorization_header(self, request=None) -> str:
-        '''
-        This function returns the value of the Authorization header
+@app.errorhandler(401)
+def unauthorized(error) -> str:
+    """ Not found handler
+    """
+    return jsonify({"error": "Unauthorized"}), 401
 
-        Args:
-            request: None
 
-        Returns:
-            The value of the Authorization header
-        '''
-        if not request:
-            return None
-        return request.headers.get('Authorization')
+@app.errorhandler(403)
+def forbidden(error) -> str:
+    """ Not found handler
+    """
+    return jsonify({"error": "Forbidden"}), 403
 
-    def current_user(self, request=None) -> TypeVar('User'):
-        '''
-        This function returns the current user
 
-        Args:
-            request: None
-
-        Returns:
-            The current user
-        '''
-        return None
+if __name__ == "__main__":
+    host = getenv("API_HOST", "0.0.0.0")
+    port = getenv("API_PORT", "5000")
+    app.run(host=host, port=port)

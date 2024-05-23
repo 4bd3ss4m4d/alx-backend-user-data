@@ -44,7 +44,6 @@ def login():
 def logout():
     '''
     This function logs out a user by destroying their session.
-    
     Returns:
         JSON-formatted 200 status code response.
     '''

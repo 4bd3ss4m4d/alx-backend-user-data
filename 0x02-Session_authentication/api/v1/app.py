@@ -36,7 +36,6 @@ if auth_type == 'session_db_auth':
 def not_found(error) -> str:
     '''
     This function returns a JSON-formatted 404 status code response.
-    
     Returns:
         str: JSON-formatted 404 status code response.
     '''
@@ -47,7 +46,6 @@ def not_found(error) -> str:
 def unauthorized(error) -> str:
     '''
     This function returns a JSON-formatted 401 status code response.
-    
     Returns:
         str: JSON-formatted 401 status code response.
     '''
@@ -58,7 +56,6 @@ def unauthorized(error) -> str:
 def forbidden(error):
     '''
     This function returns a JSON-formatted 403 status code response.
-    
     Returns:
         str: JSON-formatted 403 status code response.
     '''
@@ -69,7 +66,6 @@ def forbidden(error):
 def before_request():
     '''
     This function checks if a request is authorized to access a route.
-    
     Returns:
         None
     '''

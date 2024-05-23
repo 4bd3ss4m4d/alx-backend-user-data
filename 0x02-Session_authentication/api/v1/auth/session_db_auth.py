@@ -10,13 +10,13 @@ from datetime import datetime, timedelta
 class SessionDBAuth(SessionExpAuth):
     '''
     SessionDBAuth class
-    
+
     Attributes:
         user_id_by_session_id (dict): user id by session id
-    
+
     Methods:
         create_session(self, user_id: str = None): Creates session object
-        user_id_for_session_id(self, session_id: str = None): Get user by session id
+        user_id_for_session_id(self, session_id: str = None): Get user
         destroy_session(self, request=None): Destroy session object
     '''
     def create_session(self, user_id: str = None) -> str:
@@ -24,7 +24,7 @@ class SessionDBAuth(SessionExpAuth):
         Creates session object
         Args:
             user_id (str): user's id
-            
+
         Returns:
             str: session id
         '''

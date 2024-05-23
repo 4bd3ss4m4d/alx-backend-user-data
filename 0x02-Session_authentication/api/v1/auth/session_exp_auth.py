@@ -9,11 +9,11 @@ from api.v1.auth.session_auth import SessionAuth
 
 class SessionExpAuth(SessionAuth):
     '''
-    SessionExpAuth class 
+    SessionExpAuth class
     Attributes:
-        session_duration (int): session duration 
+        session_duration (int): session duration
     Methods:
-        __init__(self): Initializes SessionExpAuth instance 
+        __init__(self): Initializes SessionExpAuth instance
         create_session(self, user_id: str = None): Creates session id
         user_id_for_session_id(self, session_id: str = None): Gets user id
     '''
@@ -51,9 +51,9 @@ class SessionExpAuth(SessionAuth):
 
     def user_id_for_session_id(self, session_id: str = None) -> str:
         '''
-        Gets user id 
+        Gets user id
         Args:
-            session_id (str): session id 
+            session_id (str): session id
         Returns:
             str: user id
         '''

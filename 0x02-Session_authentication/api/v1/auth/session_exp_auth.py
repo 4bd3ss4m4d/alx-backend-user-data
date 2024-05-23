@@ -1,71 +1,76 @@
 #!/usr/bin/env python3
-'''
-This module contains the SessionExpAuth class
-'''
-
-from os import getenv
-from .session_auth import SessionAuth
+"""
+Expiring session module
+"""
 from datetime import datetime, timedelta
+from os import getenv
+from api.v1.auth.session_auth import SessionAuth
 
 
 class SessionExpAuth(SessionAuth):
     '''
-    SessionExpAuth class
-
-    Args:
-        SessionAuth: inherits from SessionAuth
-
+    SessionExpAuth class 
+    Attributes:
+        session_duration (int): session duration 
     Methods:
-        create_session
-        user_id_for_session_id
+        __init__(self): Initializes SessionExpAuth instance 
+        create_session(self, user_id: str = None): Creates session id
+        user_id_for_session_id(self, session_id: str = None): Gets user id
     '''
-
     def __init__(self) -> None:
         '''
-        Constructor
-        Args:
-            self: instance of the class'''
-        self.session_duration = int(getenv("SESSION_DURATION", 0))
+        Initializes SessionExpAuth instance
+        '''
+        super().__init__()
+        dur = getenv('SESSION_DURATION')
+        if not dur:
+            self.session_duration = 0
+        else:
+            try:
+                dur = int(dur)
+                self.session_duration = dur
+            except ValueError:
+                self.session_duration = 0
 
-    def create_session(self, user_id=None):
+    def create_session(self, usrId: str = None) -> str:
         '''
-        creates a session ID for a user_id
+        Creates session id
         Args:
-            user_id: the user ID
+            user_id (str): user's id
         Returns:
-            str: the session ID
+            str: session id
         '''
-        sess_id = super().create_session(user_id)
+        sess_id = super().create_session(usrId)
         if not sess_id:
             return None
-        session_dictionary = {}
-        session_dictionary['user_id'] = user_id
-        session_dictionary['created_at'] = datetime.now()
-
-        self.usrIdBySessionId[sess_id] = session_dictionary
+        usrId = SessionExpAuth.user_id_by_session_id.get(sess_id)
+        crtd_at = datetime.now()
+        sess_dict = {"user_id": usrId, "created_at": crtd_at}
+        SessionExpAuth.user_id_by_session_id.update({sess_id: sess_dict})
         return sess_id
 
-    def user_id_for_session_id(self, session_id=None):
+    def user_id_for_session_id(self, session_id: str = None) -> str:
         '''
-        returns a User ID based on a Session ID
+        Gets user id 
         Args:
-            session_id: the Session ID
+            session_id (str): session id 
         Returns:
-            str: the User ID
+            str: user id
         '''
-        if not session_id or not self.usrIdBySessionId.get(session_id):
+        if not session_id and type(session_id) is not str:
             return None
-
-        sessDit = self.usrIdBySessionId.get(session_id)
-        if not sessDit:
+        sess_info = SessionExpAuth.user_id_by_session_id.get(session_id)
+        if not sess_info:
             return None
+        usrId = sess_info.get("user_id")
+        ctd_at = sess_info.get("created_at")
 
         if self.session_duration <= 0:
-            return sessDit.get("user_id")
+            return usrId
 
-        if not sessDit.get("created_at"):
+        if not ctd_at:
             return None
-        ex_isec = timedelta(seconds=self.session_duration)
-        if (ex_isec + sessDit.get("created_at") < datetime.now()):
+        exp_data = ctd_at + timedelta(seconds=self.session_duration)
+        if datetime.now() > exp_data:
             return None
-        return sessDit.get("user_id")
+        return usrId

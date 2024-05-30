@@ -22,7 +22,7 @@ class Auth:
         - create_session: Creates session for user
         - get_user_from_session_id: Gets user based on their session id
         - destroy_session: Destroys user session
-        - get_reset_password_token: Generates reset password token for valid user
+        - get_reset_password_token: Generates reset password token for valid
         - update_password: Update password for user with matching reset token
     '''
 

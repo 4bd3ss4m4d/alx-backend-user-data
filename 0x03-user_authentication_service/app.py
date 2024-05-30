@@ -17,7 +17,6 @@ AUTH = Auth()
 def home() -> str:
     '''
     This function returns a welcome message
-    
     Returns:
         str: Welcome message
     '''
@@ -28,7 +27,6 @@ def home() -> str:
 def login():
     '''
     This function logs in a user
-    
     Returns:
         str: JSON representation of the user email and a message
     '''
@@ -46,7 +44,6 @@ def login():
 def logout():
     '''
     This function logs out a user
-    
     Returns:
         str: Redirects to the home page
     '''
@@ -90,7 +87,6 @@ def profile() -> str:
 def get_reset_password_token() -> str:
     '''
     This function generates a reset password token
-    
     Returns:
         str: JSON representation of the user email and the reset token
     '''
@@ -107,7 +103,6 @@ def get_reset_password_token() -> str:
 def update_password():
     '''
     This function updates the user password
-    
     Returns:
         str: JSON representation of the user email and a message
     '''
@@ -123,4 +118,3 @@ def update_password():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port="5000")

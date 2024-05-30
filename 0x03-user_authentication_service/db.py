@@ -12,7 +12,6 @@ from sqlalchemy import create_engine, tuple_
 from sqlalchemy.exc import InvalidRequestError
 
 
-
 class DB:
     '''
     This class is responsible for database operations

@@ -1,107 +1,140 @@
 #!/usr/bin/env python3
-"""
-E2E integration test module
-"""
+
+'''
+This is the main file for the flask app
+'''
+
 from requests import get, put, post, delete
 
 
 def register_user(email: str, password: str) -> None:
-    """ User registration test
-    """
-    # New user successfully created
-    request = post("http://0.0.0.0:5000/users",
+    '''
+    Register user test
+    Args:
+        email: str: Email of user
+        password: str: Password of user
+    Returns:
+        None
+    '''
+    req = post("http://0.0.0.0:5000/users",
                    data={'email': email, "password": password})
-    response = request.json()
-    assert response == {"email": email, "message": "user created"}
-    assert request.status_code == 200
+    res = req.json()
+    assert res == {"email": email, "message": "user created"}
+    assert req.status_code == 200
 
-    # Email already associated with user
-    request = post("http://0.0.0.0:5000/users",
+    req = post("http://0.0.0.0:5000/users",
                    data={'email': email, "password": password})
-    response = request.json()
-    assert response == {"message": "email already registered"}
-    assert request.status_code == 400
+    res = req.json()
+    assert res == {"message": "email already registered"}
+    assert req.status_code == 400
 
 
 def log_in_wrong_password(email: str, password: str) -> None:
     """ Wrong password test
     """
-    request = post("http://0.0.0.0:5000/sessions",
+    req = post("http://0.0.0.0:5000/sessions",
                    data={'email': email, "password": password})
-    assert request.status_code == 401
-    assert request.cookies.get("session_id") is None
+    assert req.status_code == 401
+    assert req.cookies.get("session_id") is None
 
 
 def log_in(email: str, password: str) -> str:
-    """ Login test
-        Return:
-            - session_id
-    """
-    request = post("http://0.0.0.0:5000/sessions",
+    '''
+    Login test
+    Args:
+        email: str: Email of user
+        password: str: Password of user
+    Returns:
+        str: Session ID
+    '''
+    req = post("http://0.0.0.0:5000/sessions",
                    data={'email': email, "password": password})
-    response = request.json()
-    session_id = request.cookies.get("session_id")
-    assert request.status_code == 200
+    response = req.json()
+    session_id = req.cookies.get("session_id")
+    assert req.status_code == 200
     assert response == {"email": email, "message": "logged in"}
     assert session_id is not None
     return session_id
 
 
 def profile_unlogged() -> None:
-    """ Signed out user profile test
-    """
-    request = get("http://0.0.0.0:5000/profile")
-    assert request.status_code == 403
+    '''
+    Unlogged user profile test
+    Returns:
+        None
+    '''
+    req = get("http://0.0.0.0:5000/profile")
+    assert req.status_code == 403
 
 
 def profile_logged(session_id: str) -> None:
-    """ Signed in user profile test
-    """
-    request = get("http://0.0.0.0:5000/profile",
+    '''
+    Logged user profile test
+    Args:
+        session_id: str: Session ID
+    Returns:
+        None
+    '''
+    re = get("http://0.0.0.0:5000/profile",
                   cookies={"session_id": session_id})
-    response = request.json()
-    assert request.status_code == 200
-    assert response == {"email": EMAIL}
+    res = re.json()
+    assert re.status_code == 200
+    assert res == {"email": EMAIL}
 
 
 def log_out(session_id: str) -> None:
-    """ Logout test
-    """
-    request = delete("http://0.0.0.0:5000/sessions",
+    '''
+    Logout test
+    Args:
+        session_id: str: Session ID
+    Returns:
+        None
+    '''
+    req = delete("http://0.0.0.0:5000/sessions",
                      cookies={"session_id": session_id},
                      allow_redirects=True)
-    response = request.json()
-    history = request.history
-    assert request.status_code == 200
-    assert len(history) == 1
-    assert history[0].status_code == 302
-    assert response == {"message": "Bienvenue"}
+    res = req.json()
+    hist = req.history
+    assert req.status_code == 200
+    assert len(hist) == 1
+    assert hist[0].status_code == 302
+    assert res == {"message": "Bienvenue"}
 
 
 def reset_password_token(email: str) -> str:
-    """ Reset token test
-        Return:
-            - reset token
-    """
-    request = post("http://0.0.0.0:5000/reset_password",
+    '''
+    Reset password token test
+    Args:
+        email: str: Email of user
+    Returns:
+        str: Reset token
+    '''
+    req = post("http://0.0.0.0:5000/reset_password",
                    data={"email": email})
-    response = request.json()
-    reset_token = response.get("reset_token")
-    assert request.status_code == 200
-    assert type(reset_token) is str
-    return reset_token
+    resp = req.json()
+    resToken = resp.get("reset_token")
+    assert req.status_code == 200
+    assert type(resToken) is str
+    return resToken
 
 
 def update_password(email: str, reset_token: str, new_password: str) -> None:
-    """ Password update test
-    """
-    request = put("http://0.0.0.0:5000/reset_password",
+    '''
+    Update password test
+    Args:
+        email: str: Email of user
+        reset_token: str: Reset token
+        new_password: str: New password
+    Returns:
+        None
+    '''
+    req = put("http://0.0.0.0:5000/reset_password",
                   data={"email": email, "new_password":
                         new_password, "reset_token":
                         reset_token})
-    response = request.json()
-    assert request.status_code == 200
-    assert response == {"email": email, "message": "Password updated"}
+    res = req.json()
+    assert req.status_code == 200
+    assert res == {"email": email, "message": "Password updated"}
 
 
 EMAIL = "guillaume@holberton.io"

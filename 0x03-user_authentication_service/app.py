@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-""" A basic flask app"""
+
+'''
+This is the main file for the flask app
+'''
+
 from flask import Flask, jsonify, request
 from auth import Auth
 
@@ -10,19 +14,27 @@ AUTH = Auth()
 
 @app.route('/')
 def index():
-    """ Return a basic json"""
+    '''
+    Index route
+    Returns:
+        dict: Welcome message
+    '''
     return jsonify({"message": "Bienvenue"})
 
 
 @app.route('/users', methods=['POST'])
 def users():
-    """A users route """
-    email = request.form.get('email')
-    password = request.form.get('password')
-    if email and password:
+    '''
+    Users route
+    Returns:
+        dict: User created message
+    '''
+    ml = request.form.get('email')
+    pswd = request.form.get('password')
+    if ml and pswd:
         try:
-            AUTH.register_user(email, password)
-            return jsonify({"email": email, "message": "user created"})
+            AUTH.register_user(ml, pswd)
+            return jsonify({"email": ml, "message": "user created"})
         except ValueError:
             return jsonify({"message": "email already registered"}), 400
     else:

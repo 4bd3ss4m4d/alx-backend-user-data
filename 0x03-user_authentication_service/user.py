@@ -1,13 +1,26 @@
 #!/usr/bin/env python3
-""" A user model """
-from sqlalchemy import Column, Integer, String
+
+'''
+This is the main file for the flask app
+'''
+
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String
 
 Base = declarative_base()
 
 
 class User(Base):
-    """ User model for a database"""
+    '''
+    User class
+    
+    Attributes:
+        id: int: User ID
+        email: str: User email
+        hashed_password: str: User hashed password
+        session_id: str: User session ID
+        reset_token: str: User reset token
+    '''
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)

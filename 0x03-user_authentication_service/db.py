@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """DB module
 """
-from sqlalchemy import create_engine
-from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.exc import InvalidRequestError
-from sqlalchemy.orm.session import Session
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.session import Session
+from sqlalchemy import create_engine
+from sqlalchemy.exc import InvalidRequestError
+from sqlalchemy.ext.declarative import declarative_base
 
 
 from user import Base, User
@@ -14,20 +14,16 @@ from user import Base, User
 
 class DB:
     '''
-    DB class
-    
+    This class is the database interface
     Methods:
-        add_user: Add a new user
-        find_user_by: Find a user by a given attribute
-        update_user: Update a user by a given attribute
+        add_user: add a new user to the db
+        find_user_by: find a user from the db given arbitrary args
+        update_user: update a user in the db with arbitrary args
     '''
 
     def __init__(self) -> None:
         '''
         Constructor
-        
-        Returns:
-            None
         '''
         self._engine = create_engine("sqlite:///a.db", echo=False)
         Base.metadata.drop_all(self._engine)
@@ -37,10 +33,9 @@ class DB:
     @property
     def _session(self) -> Session:
         '''
-        Session property
-        
+        This function should return the current session
         Returns:
-            Session: Session object
+            Session: the current session
         '''
         if self.__session is None:
             DBSession = sessionmaker(bind=self._engine)
@@ -49,25 +44,25 @@ class DB:
 
     def add_user(self, email: str, hashed_password: str) -> User:
         '''
-        Add a new user
+        This function should add a user to the database
         Args:
-            email: str: Email of user
-            hashed_password: str: Hashed password of user
+            email: string type
+            hashed_password: string type
         Returns:
-            User: New user
+            User: a new user object
         '''
-        nuser = User(email=email, hashed_password=hashed_password)
-        self._session.add(nuser)
+        usr = User(email=email, hashed_password=hashed_password)
+        self._session.add(usr)
         self._session.commit()
-        return nuser
+        return usr
 
     def find_user_by(self, **kwargs) -> User:
         '''
-        Find a user by a given attribute
+        This function should find a user in the database
         Args:
-            **kwargs: Arbitrary keyword arguments
+            **kwargs: arbitrary keyword arguments
         Returns:
-            User: User object
+            User: a user object
         '''
         try:
             usr = self._session.query(User).filter_by(**kwargs).one()
@@ -79,16 +74,17 @@ class DB:
 
     def update_user(self, user_id: int, **kwargs) -> None:
         '''
-        Update a user by a given attribute
+        This function should update a user in the database
         Args:
-            user_id: int: User id
-            **kwargs: Arbitrary keyword arguments
+            user_id: integer type
+            **kwargs: arbitrary keyword arguments
         Returns:
             None
         '''
         usr = self.find_user_by(id=user_id)
-        for k, v in kwargs.items():
-            if not hasattr(User, k):
-                raise ValueError()
-            setattr(usr, k, v)
-        return None
+        for key, value in kwargs.items():
+            if hasattr(usr, key):
+                setattr(usr, key, value)
+            else:
+                raise ValueError
+        self._session.commit()
